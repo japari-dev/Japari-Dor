@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 
 class GameBoard extends StatelessWidget {
-  const GameBoard({Key key}) : super(key: key);
+  const GameBoard({
+    Key key,
+    this.onTapBox,
+  }) : super(key: key);
 
   static double get boxSize => 32;
   static double get wallThin => 4;
   static double get clearance => 2;
+
+  final Function onTapBox;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,7 @@ class GameBoard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: range(0, 17)
                         .map((ci) => ci.toInt().isEven
-                            ? Box(ri, ci, boxSize)
+                            ? Box(ri, ci, boxSize, onTapBox)
                             : VerticalWall(
                                 ri,
                                 ci,
@@ -121,11 +126,13 @@ class VerticalWall extends StatelessWidget {
 }
 
 class Box extends StatelessWidget {
-  const Box(this.x, this.y, this.size, {Key key}) : super(key: key);
+  const Box(this.x, this.y, this.size, this.onTapBox, {Key key})
+      : super(key: key);
 
   final int x;
   final int y;
   final double size;
+  final onTapBox;
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +145,7 @@ class Box extends StatelessWidget {
       ),
       onTap: () {
         debugPrint('(type,x,y):(Box,$x,$y)');
+        onTapBox(x ~/ 2, y ~/ 2);
       },
     );
   }
