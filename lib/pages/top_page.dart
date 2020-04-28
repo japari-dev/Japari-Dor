@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:japaridor/components/game_board.dart';
+import 'package:japaridor/components/game.dart';
 
 class TopPage extends StatelessWidget {
-  final _player = [
-    {'color': Colors.amber, 'direction': Icons.arrow_upward},
-    {'color': Colors.greenAccent, 'direction': Icons.arrow_downward},
-  ];
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -17,9 +12,7 @@ class TopPage extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.all(12),
-          child: GameBoard(
-            boxSize: 32,
-          ),
+          child: Game(),
         ),
       ),
     );

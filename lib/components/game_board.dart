@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 
 class GameBoard extends StatelessWidget {
-  const GameBoard({
-    Key key,
-    this.boxSize,
-  }) : super(key: key);
+  const GameBoard({Key key}) : super(key: key);
 
-  final double boxSize;
-  final double wallThin = 4;
-  final double clearance = 2;
+  static double get boxSize => 32;
+  static double get wallThin => 4;
+  static double get clearance => 2;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: range(0, 17)
           .map(
             (ri) => ri.toInt().isEven
                 ? Row(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: range(0, 17)
@@ -32,6 +32,7 @@ class GameBoard extends StatelessWidget {
                               ))
                         .toList())
                 : Row(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: range(0, 17)
