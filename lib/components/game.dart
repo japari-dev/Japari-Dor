@@ -17,20 +17,45 @@ class _GameState extends State<Game> {
   ];
 
   @override
+  void didUpdateWidget(Game oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
             GameBoard(
-              onTapBox: (xi, yi) {
+              onTapBox: (xi, yi) async {
                 setState(() {
                   _player[0] = PlayerPiece(
                       1, Colors.amber, Icons.arrow_upward, Position(xi, yi));
+                });
+
+                final winner = _jadgeWin();
+                if (winner == null) {
+                  return;
+                }
+                await showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: Text('あなたの勝利です'),
+                  ),
+                );
+
+                setState(() {
+                  _player[0] = PlayerPiece(
+                      1, Colors.amber, Icons.arrow_upward, Position(8, 4));
                 });
               },
             )
           ] +
           _player,
     );
+  }
+
+  PlayerPiece _jadgeWin() {
+    if (_player[0].position.xi == 0) return _player[0];
   }
 }
 
