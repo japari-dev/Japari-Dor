@@ -7,7 +7,9 @@ class GameBoard extends StatelessWidget {
     this.boxSize,
   }) : super(key: key);
 
-  final int boxSize;
+  final double boxSize;
+  final double wallThin = 4;
+  final double clearance = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +23,27 @@ class GameBoard extends StatelessWidget {
                     children: range(0, 17)
                         .map((ci) => ci.toInt().isEven
                             ? Box(ri, ci, boxSize)
-                            : VerticalWall(ri, ci, boxSize))
+                            : VerticalWall(
+                                ri,
+                                ci,
+                                boxSize,
+                                wallThin,
+                                clearance,
+                              ))
                         .toList())
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: range(0, 17)
                         .map((ci) => ci.toInt().isEven
-                            ? HorizontalWall(ri, ci, boxSize)
-                            : JointWall())
+                            ? HorizontalWall(
+                                ri,
+                                ci,
+                                boxSize,
+                                wallThin,
+                                clearance,
+                              )
+                            : JointWall(wallThin))
                         .toList(),
                   ),
           )
@@ -39,34 +53,38 @@ class GameBoard extends StatelessWidget {
 }
 
 class JointWall extends StatelessWidget {
-  const JointWall({
-    Key key,
-  }) : super(key: key);
+  const JointWall(this.wallWidth, {Key key}) : super(key: key);
+
+  final double wallWidth;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.blueGrey,
-      width: 4,
-      height: 4,
+      width: wallWidth,
+      height: wallWidth,
     );
   }
 }
 
 class HorizontalWall extends StatelessWidget {
-  const HorizontalWall(this.x, this.y, this.size, {Key key}) : super(key: key);
+  const HorizontalWall(this.x, this.y, this.size, this.wallThin, this.clearance,
+      {Key key})
+      : super(key: key);
 
   final int x;
   final int y;
-  final int size;
+  final double size;
+  final double wallThin;
+  final double clearance;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       child: Container(
         color: Colors.blueGrey,
-        width: size + 4.0,
-        height: 4,
+        width: size + clearance * 2,
+        height: wallThin,
       ),
       onTap: () {
         debugPrint('(type,x,y):(HorizontalWall,$x,$y)');
@@ -76,19 +94,23 @@ class HorizontalWall extends StatelessWidget {
 }
 
 class VerticalWall extends StatelessWidget {
-  const VerticalWall(this.x, this.y, this.size, {Key key}) : super(key: key);
+  const VerticalWall(this.x, this.y, this.size, this.wallThin, this.clearance,
+      {Key key})
+      : super(key: key);
 
   final int x;
   final int y;
-  final int size;
+  final double size;
+  final double wallThin;
+  final double clearance;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       child: Container(
         color: Colors.blueGrey,
-        width: 4,
-        height: size + 4.0,
+        width: wallThin,
+        height: size + clearance * 2,
       ),
       onTap: () {
         debugPrint('(type,x,y):(VerticalWall,$x,$y)');
@@ -102,7 +124,7 @@ class Box extends StatelessWidget {
 
   final int x;
   final int y;
-  final int size;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -110,8 +132,8 @@ class Box extends StatelessWidget {
       child: Container(
         color: Colors.brown,
         margin: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-        width: size.toDouble(),
-        height: size.toDouble(),
+        width: size,
+        height: size,
       ),
       onTap: () {
         debugPrint('(type,x,y):(Box,$x,$y)');
