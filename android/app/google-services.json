@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "868670824059",
+    "firebase_url": "https://japaridor.firebaseio.com",
+    "project_id": "japaridor",
+    "storage_bucket": "japaridor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:868670824059:android:25fd44fccca851de810cde",
+        "android_client_info": {
+          "package_name": "works.aiki.japaridor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "868670824059-pocm6hial24eoa3rg4909922q9sh1k4u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0HPrmTnCudBxwacuCe48g5LkfEsj7CbE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "868670824059-pocm6hial24eoa3rg4909922q9sh1k4u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

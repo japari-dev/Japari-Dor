@@ -17,41 +17,60 @@ class _GameState extends State<Game> {
   ];
 
   @override
-  void didUpdateWidget(Game oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topRight,
+          child: IconButton(
+            icon: Icon(Icons.repeat),
+            color: Colors.white,
+            onPressed: () {
+              initGame();
+            },
+          ),
+        ),
+        Stack(
+          children: <Widget>[
+                GameBoard(
+                  onTapBox: (xi, yi) async {
+                    setState(() {
+                      _player[0] = PlayerPiece(1, Colors.amber,
+                          Icons.arrow_upward, Position(xi, yi));
+                    });
+
+                    final winner = _jadgeWin();
+                    if (winner == null) {
+                      return;
+                    }
+                    await showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text('あなたの勝利です'),
+                      ),
+                    );
+
+                    setState(() {
+                      _player[0] = PlayerPiece(
+                          1, Colors.amber, Icons.arrow_upward, Position(8, 4));
+                    });
+                  },
+                )
+              ] +
+              _player,
+        ),
+      ],
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-            GameBoard(
-              onTapBox: (xi, yi) async {
-                setState(() {
-                  _player[0] = PlayerPiece(
-                      1, Colors.amber, Icons.arrow_upward, Position(xi, yi));
-                });
-
-                final winner = _jadgeWin();
-                if (winner == null) {
-                  return;
-                }
-                await showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: Text('あなたの勝利です'),
-                  ),
-                );
-
-                setState(() {
-                  _player[0] = PlayerPiece(
-                      1, Colors.amber, Icons.arrow_upward, Position(8, 4));
-                });
-              },
-            )
-          ] +
-          _player,
-    );
+  void initGame() {
+    setState(() {
+      _player = [
+        PlayerPiece(1, Colors.amber, Icons.arrow_upward, Position(8, 4)),
+        PlayerPiece(
+            2, Colors.greenAccent, Icons.arrow_downward, Position(0, 4)),
+      ];
+    });
   }
 
   PlayerPiece _jadgeWin() {
