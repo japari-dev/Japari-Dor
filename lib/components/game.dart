@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:japaridor/components/game_board.dart';
+import 'package:japaridor/services/game_service.dart';
 
 class Game extends StatefulWidget {
   const Game({
@@ -11,10 +13,57 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
+  DocumentReference gameRef;
   var _player = [
     PlayerPiece(1, Colors.amber, Icons.arrow_upward, Position(8, 4)),
     PlayerPiece(2, Colors.greenAccent, Icons.arrow_downward, Position(0, 4)),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    GameService.createGame().then((value) {
+      gameRef = value;
+      Firestore.instance
+          .collection('/games/${value.documentID}/actions')
+          .snapshots()
+          .listen(
+        (event) async {
+          setState(() {
+            event.documentChanges.forEach((e) {
+              final action = e.document.data;
+              _player[action['uid'] - 1] = PlayerPiece(
+                1,
+                Colors.amber,
+                Icons.arrow_upward,
+                Position(
+                  action['move']['xi'],
+                  action['move']['yi'],
+                ),
+              );
+            });
+          });
+
+          final winner = _jadgeWin();
+          if (winner == null) {
+            return;
+          }
+          await showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text('あなたの勝利です'),
+            ),
+          );
+
+          setState(() {
+            _player[0] = PlayerPiece(
+                1, Colors.amber, Icons.arrow_upward, Position(8, 4));
+          });
+        },
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,25 +83,12 @@ class _GameState extends State<Game> {
           children: <Widget>[
                 GameBoard(
                   onTapBox: (xi, yi) async {
-                    setState(() {
-                      _player[0] = PlayerPiece(1, Colors.amber,
-                          Icons.arrow_upward, Position(xi, yi));
-                    });
-
-                    final winner = _jadgeWin();
-                    if (winner == null) {
-                      return;
-                    }
-                    await showDialog(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: Text('あなたの勝利です'),
-                      ),
-                    );
-
-                    setState(() {
-                      _player[0] = PlayerPiece(
-                          1, Colors.amber, Icons.arrow_upward, Position(8, 4));
+                    Firestore.instance
+                        .collection('/games/${gameRef.documentID}/actions')
+                        .add({
+                      'createdAt': DateTime.now(),
+                      'uid': 1,
+                      'move': {'xi': xi, 'yi': yi},
                     });
                   },
                 )
@@ -63,7 +99,10 @@ class _GameState extends State<Game> {
     );
   }
 
-  void initGame() {
+  void initGame() async {
+    GameService.createGame().then((value) {
+      gameRef = value;
+    });
     setState(() {
       _player = [
         PlayerPiece(1, Colors.amber, Icons.arrow_upward, Position(8, 4)),
