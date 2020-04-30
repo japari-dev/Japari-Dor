@@ -33,6 +33,7 @@ class _GameState extends State<Game> {
           setState(() {
             event.documentChanges.forEach((e) {
               final action = e.document.data;
+              debugPrint('server: $action');
               _player[action['uid'] - 1] = PlayerPiece(
                 1,
                 Colors.amber,

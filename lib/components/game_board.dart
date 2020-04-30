@@ -93,7 +93,7 @@ class HorizontalWall extends StatelessWidget {
         height: wallThin,
       ),
       onTap: () {
-        debugPrint('(type,x,y):(HorizontalWall,$x,$y)');
+        debugPrint('client: (type,x,y):(HorizontalWall,$x,$y)');
       },
     );
   }
@@ -119,7 +119,7 @@ class VerticalWall extends StatelessWidget {
         height: size + clearance * 2,
       ),
       onTap: () {
-        debugPrint('(type,x,y):(VerticalWall,$x,$y)');
+        debugPrint('client: (type,x,y):(VerticalWall,$x,$y)');
       },
     );
   }
@@ -144,7 +144,7 @@ class Box extends StatelessWidget {
         height: size,
       ),
       onTap: () {
-        debugPrint('(type,x,y):(Box,$x,$y)');
+        debugPrint('client: (type,x,y):(Box,$x,$y)');
         onTapBox(x ~/ 2, y ~/ 2);
       },
     );
