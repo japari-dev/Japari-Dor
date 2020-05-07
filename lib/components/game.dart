@@ -15,8 +15,8 @@ class Game extends StatefulWidget {
 class _GameState extends State<Game> {
   DocumentReference gameRef;
   var _player = [
-    PlayerPiece(1, Colors.amber, Icons.arrow_upward, Position(8, 4)),
-    PlayerPiece(2, Colors.greenAccent, Icons.arrow_downward, Position(0, 4)),
+    PlayerPiece(0, Colors.amber, Icons.arrow_upward, Position(8, 4)),
+    PlayerPiece(1, Colors.greenAccent, Icons.arrow_downward, Position(0, 4)),
   ];
 
   @override
@@ -34,8 +34,8 @@ class _GameState extends State<Game> {
             event.documentChanges.forEach((e) {
               final action = e.document.data;
               debugPrint('server: $action');
-              _player[action['uid'] - 1] = PlayerPiece(
-                1,
+              _player[action['uid']] = PlayerPiece(
+                action['uid'],
                 Colors.amber,
                 Icons.arrow_upward,
                 Position(
@@ -46,7 +46,7 @@ class _GameState extends State<Game> {
             });
           });
 
-          final winner = _jadgeWin();
+          final winner = _judgeWin();
           if (winner == null) {
             return;
           }
@@ -83,21 +83,21 @@ class _GameState extends State<Game> {
         Stack(
           children: <Widget>[
                 GameBoard(
-                  onTapBox: (xi, yi) async {
-                    Firestore.instance
-                        .collection('/games/${gameRef.documentID}/actions')
-                        .add({
-                      'createdAt': DateTime.now(),
-                      'uid': 1,
-                      'move': {'xi': xi, 'yi': yi},
-                    });
-                  },
+                  onTapBox: _onTapBox,
                 )
               ] +
               _player,
         ),
       ],
     );
+  }
+
+  _onTapBox(xi, yi) {
+    Firestore.instance.collection('/games/${gameRef.documentID}/actions').add({
+      'createdAt': DateTime.now(),
+      'uid': 1,
+      'move': {'xi': xi, 'yi': yi},
+    });
   }
 
   void initGame() async {
@@ -113,8 +113,9 @@ class _GameState extends State<Game> {
     });
   }
 
-  PlayerPiece _jadgeWin() {
+  PlayerPiece _judgeWin() {
     if (_player[0].position.xi == 0) return _player[0];
+    return null;
   }
 }
 
