@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:japaridor/pages/top_page.dart';
+import 'package:japaridor/state/game_controller.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider<GameController>(
+      create: (_) => GameController(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

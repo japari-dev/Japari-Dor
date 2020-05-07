@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:japaridor/state/game_controller.dart';
 import 'package:quiver/iterables.dart';
 
 class GameBoard extends StatelessWidget {
   const GameBoard({
     Key key,
+    this.controller,
     this.onTapBox,
   }) : super(key: key);
 
@@ -12,6 +14,7 @@ class GameBoard extends StatelessWidget {
   static double get clearance => 2;
 
   final Function onTapBox;
+  final GameController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -20,17 +23,17 @@ class GameBoard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: range(0, 17)
           .map(
-            (ri) => ri.toInt().isEven
+            (yi) => yi.toInt().isEven
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: range(0, 17)
-                        .map((ci) => ci.toInt().isEven
-                            ? Box(ri, ci, boxSize, onTapBox)
+                        .map((xi) => xi.toInt().isEven
+                            ? Box(controller, xi, yi, boxSize, onTapBox)
                             : VerticalWall(
-                                ri,
-                                ci,
+                                yi,
+                                xi,
                                 boxSize,
                                 wallThin,
                                 clearance,
@@ -43,7 +46,7 @@ class GameBoard extends StatelessWidget {
                     children: range(0, 17)
                         .map((ci) => ci.toInt().isEven
                             ? HorizontalWall(
-                                ri,
+                                yi,
                                 ci,
                                 boxSize,
                                 wallThin,
@@ -126,9 +129,11 @@ class VerticalWall extends StatelessWidget {
 }
 
 class Box extends StatelessWidget {
-  const Box(this.x, this.y, this.size, this.onTapBox, {Key key})
+  const Box(this.controller, this.x, this.y, this.size, this.onTapBox,
+      {Key key})
       : super(key: key);
 
+  final controller;
   final int x;
   final int y;
   final double size;
@@ -145,7 +150,7 @@ class Box extends StatelessWidget {
       ),
       onTap: () {
         debugPrint('client: (type,x,y):(Box,$x,$y)');
-        onTapBox(x ~/ 2, y ~/ 2);
+        onTapBox(controller, x ~/ 2, y ~/ 2);
       },
     );
   }
