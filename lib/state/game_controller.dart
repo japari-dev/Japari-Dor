@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,11 +30,11 @@ class GameController extends ChangeNotifier {
         .snapshots()
         .listen(
       (event) {
-        event.documents.take(1).forEach(
+        event.documents.take(2).forEach(
           (action) {
             final data = action.data;
             debugPrint(data.toString());
-            _turn = data['turn'];
+            _turn = max<int>(_turn, data['turn']);
             movePlayer(data['uid'], data['x'], data['y']);
             notifyListeners();
           },
@@ -45,7 +47,7 @@ class GameController extends ChangeNotifier {
     Firestore.instance.collection('games/${_gameRef.documentID}/actions').add(
       {
         'turn': _turn + 1,
-        'uid': uid,
+        'uid': _turn % 2,
         'x': x,
         'y': y,
       },

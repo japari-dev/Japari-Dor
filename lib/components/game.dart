@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 class Game extends StatelessWidget {
   final uid = 0;
+  final _playerColors = [Colors.red, Colors.amberAccent];
   @override
   Widget build(BuildContext context) {
     return Consumer<GameController>(
@@ -37,7 +38,7 @@ class Game extends StatelessWidget {
                       child: Container(
                         width: GameBoard.boxSize,
                         height: GameBoard.boxSize,
-                        color: Colors.white,
+                        color: _playerColors[e.uid],
                       ),
                     );
                   },
