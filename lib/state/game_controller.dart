@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,27 +6,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class GameController extends ChangeNotifier {
-  var _players;
-  var _turn;
   DocumentReference _gameRef;
+  List<Player> _players = [];
+  int _uid;
+  int _turn;
+  StreamSubscription _actionSub;
+
   List<Player> get players => _players;
 
   GameController() {
-    initGame();
+    initGame().then((value) => join(0, value.documentID));
   }
 
-  void initGame() async {
-    _turn = 0;
-    _players = [
-      Player(0, 4, 8),
-      Player(1, 4, 0),
-    ];
-    _gameRef = await Firestore.instance
-        .collection('games')
-        .add({'createdAt': DateTime.now()});
-
-    Firestore.instance
-        .collection('games/${_gameRef.documentID}/actions')
+  void join(int uid, String gameId) {
+    _gameRef = Firestore.instance.collection('games').document(gameId);
+    _uid = uid;
+    _actionSub?.cancel();
+    _actionSub = _gameRef
+        .collection('actions')
         .orderBy('turn', descending: true)
         .snapshots()
         .listen(
@@ -33,7 +31,8 @@ class GameController extends ChangeNotifier {
         event.documents.take(2).forEach(
           (action) {
             final data = action.data;
-            debugPrint(data.toString());
+            debugPrint('action: ' + data.toString());
+
             _turn = max<int>(_turn, data['turn']);
             movePlayer(data['uid'], data['x'], data['y']);
             notifyListeners();
@@ -43,11 +42,23 @@ class GameController extends ChangeNotifier {
     );
   }
 
+  Future<DocumentReference> initGame() async {
+    _turn = 0;
+    _players = [
+      Player(0, 4, 8),
+      Player(1, 4, 0),
+    ];
+    return await Firestore.instance
+        .collection('games')
+        .add({'createdAt': DateTime.now()});
+  }
+
   void sendAction(int uid, int x, int y) {
+    if (_turn % 2 != _uid) return;
     Firestore.instance.collection('games/${_gameRef.documentID}/actions').add(
       {
         'turn': _turn + 1,
-        'uid': _turn % 2,
+        'uid': _uid,
         'x': x,
         'y': y,
       },

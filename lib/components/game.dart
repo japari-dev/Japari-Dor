@@ -16,9 +16,9 @@ class Game extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.repeat),
               color: Colors.white,
-              onPressed: () {
-                // init game
-                game.initGame();
+              onPressed: () async {
+                final gameRef = await game.initGame();
+                game.join(0, gameRef.documentID);
               },
             ),
           ),
