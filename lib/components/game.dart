@@ -11,16 +11,29 @@ class Game extends StatelessWidget {
     return Consumer<GameController>(
       builder: (context, game, child) => Column(
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              icon: Icon(Icons.repeat),
-              color: Colors.white,
-              onPressed: () async {
-                final gameRef = await game.initGame();
-                game.join(0, gameRef.documentID);
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                game.isYourTurn ? 'your turn' : 'other player\'s turn',
+                style: TextStyle(color: Colors.white),
+              ),
+              IconButton(
+                icon: Icon(Icons.people),
+                color: Colors.white,
+                onPressed: () {
+                  game.battle();
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.repeat),
+                color: Colors.white,
+                onPressed: () async {
+                  final gameRef = await game.initGame();
+                  game.join(0, gameRef.documentID);
+                },
+              ),
+            ],
           ),
           Stack(
             children: <Widget>[

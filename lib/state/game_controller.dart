@@ -13,6 +13,7 @@ class GameController extends ChangeNotifier {
   StreamSubscription _actionSub;
 
   List<Player> get players => _players;
+  bool get isYourTurn => _turn % 2 == _uid;
 
   GameController() {
     initGame().then((value) => join(0, value.documentID));
@@ -48,9 +49,20 @@ class GameController extends ChangeNotifier {
       Player(0, 4, 8),
       Player(1, 4, 0),
     ];
+    notifyListeners();
     return await Firestore.instance
         .collection('games')
         .add({'createdAt': DateTime.now()});
+  }
+
+  void battle() {
+    Firestore.instance
+        .collection('games')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .listen((event) {
+      join(1, event.documents.first.documentID);
+    });
   }
 
   void sendAction(int uid, int x, int y) {
