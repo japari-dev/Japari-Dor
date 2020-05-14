@@ -11,9 +11,12 @@ class GameController extends ChangeNotifier {
   int _uid;
   int _turn;
   StreamSubscription _actionSub;
+  Player _winner;
 
   List<Player> get players => _players;
   bool get isYourTurn => _turn % 2 == _uid;
+  Player get winner => _winner;
+  bool get hasWinner => _winner != null;
 
   GameController() {
     initGame().then((value) => join(0, value.documentID));
@@ -36,6 +39,7 @@ class GameController extends ChangeNotifier {
 
             _turn = max<int>(_turn, data['turn']);
             movePlayer(data['uid'], data['x'], data['y']);
+            _judge();
             notifyListeners();
           },
         );
@@ -49,6 +53,7 @@ class GameController extends ChangeNotifier {
       Player(0, 4, 8),
       Player(1, 4, 0),
     ];
+    _winner = null;
     notifyListeners();
     return await Firestore.instance
         .collection('games')
@@ -79,6 +84,16 @@ class GameController extends ChangeNotifier {
 
   void movePlayer(int uid, int x, int y) {
     _players.firstWhere((player) => player.uid == uid).move(x, y);
+  }
+
+  void _judge() {
+    if (_players[0].y == 0) {
+      _winner = _players[0];
+    } else if (_players[1].y == 8) {
+      _winner = _players[1];
+    } else {
+      _winner = null;
+    }
   }
 }
 
