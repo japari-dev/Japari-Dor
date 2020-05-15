@@ -67,7 +67,15 @@ class Game extends StatelessWidget {
                       );
                     },
                   ).toList(),
-            )
+            ),
+            Row(
+              children: [
+                Text(
+                  'game: ${game.toJson()}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
           ],
         );
       },

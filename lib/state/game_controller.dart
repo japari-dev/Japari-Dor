@@ -7,9 +7,12 @@ import 'package:flutter/material.dart';
 
 class GameController extends ChangeNotifier {
   DocumentReference _gameRef;
-  List<Player> _players = [];
+  List<Player> _players = [
+    Player(0, 0, 0),
+    Player(1, 0, 0),
+  ];
   int _uid;
-  int _turn;
+  int _turn = 0;
   StreamSubscription _actionSub;
   Player _winner;
 
@@ -24,6 +27,7 @@ class GameController extends ChangeNotifier {
 
   void join(int uid, String gameId) {
     _gameRef = Firestore.instance.collection('games').document(gameId);
+    _turn = 0;
     _uid = uid;
     _actionSub?.cancel();
     _actionSub = _gameRef
@@ -40,32 +44,36 @@ class GameController extends ChangeNotifier {
             _turn = max<int>(_turn, data['turn']);
             movePlayer(data['uid'], data['x'], data['y']);
             _judge();
-            notifyListeners();
           },
         );
+        notifyListeners();
       },
     );
   }
 
   Future<DocumentReference> initGame() async {
-    _turn = 0;
-    _players = [
-      Player(0, 4, 8),
-      Player(1, 4, 0),
-    ];
-    _winner = null;
-    notifyListeners();
-    return await Firestore.instance
+    final gameRef = await Firestore.instance
         .collection('games')
         .add({'createdAt': DateTime.now()});
+    await Firestore.instance
+        .collection('games/${gameRef.documentID}/actions')
+        .add(
+      {'turn': 0, 'uid': 0, 'x': 4, 'y': 8},
+    );
+    await Firestore.instance
+        .collection('games/${gameRef.documentID}/actions')
+        .add(
+      {'turn': 0, 'uid': 1, 'x': 4, 'y': 0},
+    );
+    return gameRef;
   }
 
   void battle() {
     Firestore.instance
         .collection('games')
         .orderBy('createdAt', descending: true)
-        .snapshots()
-        .listen((event) {
+        .getDocuments()
+        .then((event) {
       join(1, event.documents.first.documentID);
     });
   }
@@ -95,6 +103,13 @@ class GameController extends ChangeNotifier {
       _winner = null;
     }
   }
+
+  String toJson() => '''
+  {
+    "turn": "$_turn",
+    "uid": "$_uid",
+    "gameId": "${_gameRef?.documentID}"
+  }''';
 }
 
 class Player {
