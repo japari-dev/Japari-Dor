@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class GameController extends ChangeNotifier {
     Player(1, 0, 0),
   ];
   int _uid;
+  FirebaseUser _user;
   int _turn = 0;
   StreamSubscription _actionSub;
   Player _winner;
@@ -21,8 +23,10 @@ class GameController extends ChangeNotifier {
   Player get winner => _winner;
   bool get hasWinner => _winner != null;
 
-  GameController() {
-    initGame().then((value) => join(0, value.documentID));
+  void init() async {
+    _user = await FirebaseAuth.instance.currentUser();
+    final game = await initGame();
+    join(0, game.documentID);
   }
 
   void join(int uid, String gameId) {
@@ -54,7 +58,7 @@ class GameController extends ChangeNotifier {
   Future<DocumentReference> initGame() async {
     final gameRef = await Firestore.instance
         .collection('games')
-        .add({'createdAt': DateTime.now()});
+        .add({'createdAt': DateTime.now(), 'owner': _user.uid});
     await Firestore.instance
         .collection('games/${gameRef.documentID}/actions')
         .add(

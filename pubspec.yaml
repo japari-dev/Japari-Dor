@@ -25,6 +25,7 @@ dependencies:
     sdk: flutter
   quiver: any
   cloud_firestore: any
+  firebase_auth: any
   provider: any
 
 
